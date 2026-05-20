@@ -1,5 +1,5 @@
 export interface TaxCalculationRequest {
-  userEmail: string;
+  userId: string;
   title: string;
   description: string;
   salary: number;
