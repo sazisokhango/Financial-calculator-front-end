@@ -17,8 +17,8 @@
 
 **Purpose**: Wiring that must exist before any component work begins.
 
-- [ ] T001 Verify `provideHttpClient()` is present in `src/app/app.config.ts`; add if missing
-- [ ] T002 [P] Create `src/app/models/user.model.ts` — export `User` interface with `id: number`, `firstName: string`, `lastName: string`, `email: string`
+- [x] T001 Verify `provideHttpClient()` is present in `src/app/app.config.ts`; add if missing
+- [x] T002 [P] Create `src/app/models/user.model.ts` — export `User` interface with `id: number`, `firstName: string`, `lastName: string`, `email: string`
 
 ---
 
@@ -28,8 +28,8 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T003 Create `src/app/services/user.service.ts` — `@Injectable({ providedIn: 'root' })`, inject `HttpClient`, implement `getAll(): Observable<User[]>` calling `GET ${environment.apiBaseUrl}/user`, pipe `catchError` to re-throw with `(err.error?.message ?? 'Could not load users')`
-- [ ] T004 Add `{ path: '', component: HomeComponent }` to `src/app/app.routes.ts`
+- [x] T003 Create `src/app/services/user.service.ts` — `@Injectable({ providedIn: 'root' })`, inject `HttpClient`, implement `getAll(): Observable<User[]>` calling `GET ${environment.apiBaseUrl}/user`, pipe `catchError` to re-throw with `(err.error?.message ?? 'Could not load users')`
+- [x] T004 Add `{ path: '', component: HomeComponent }` to `src/app/app.routes.ts`
 
 **Checkpoint**: Service and route ready — user story implementation can begin.
 
@@ -41,9 +41,9 @@
 
 **Independent Test**: Start the app with the back-end running. Confirm the people list loads and clicking a name navigates to the correct `/user/:id` URL.
 
-- [ ] T005 [US1] Create `src/app/home/home.component.ts` — `standalone: true`, imports `ReactiveFormsModule` + `RouterModule`, inject `UserService` + `Router`, declare signals `users = signal<User[]>([])`, `loading = signal(true)`, `error = signal<string | null>(null)`, implement `ngOnInit()` subscribing to `userService.getAll()` (set signals on success/error), implement `goToDashboard(id: number)` calling `this.router.navigate(['/user', id])`
-- [ ] T006 [US1] Create `src/app/home/home.component.html` — page header with app title, `@if (loading())` spinner div, `@if (error())` red error banner showing `{{ error() }}`, `@if (!loading() && !error())` wrapper containing `@for (user of users(); track user.id)` block rendering a `<button (click)="goToDashboard(user.id)">{{ user.firstName }} {{ user.lastName }}</button>` per user
-- [ ] T007 [P] [US1] Create `src/app/home/home.component.css` — empty file (Tailwind only)
+- [x] T005 [US1] Create `src/app/home/home.component.ts` — `standalone: true`, imports `ReactiveFormsModule` + `RouterModule`, inject `UserService` + `Router`, declare signals `users = signal<User[]>([])`, `loading = signal(true)`, `error = signal<string | null>(null)`, implement `ngOnInit()` subscribing to `userService.getAll()` (set signals on success/error), implement `goToDashboard(id: number)` calling `this.router.navigate(['/user', id])`
+- [x] T006 [US1] Create `src/app/home/home.component.html` — page header with app title, `@if (loading())` spinner div, `@if (error())` red error banner showing `{{ error() }}`, `@if (!loading() && !error())` wrapper containing `@for (user of users(); track user.id)` block rendering a `<button (click)="goToDashboard(user.id)">{{ user.firstName }} {{ user.lastName }}</button>` per user
+- [x] T007 [P] [US1] Create `src/app/home/home.component.css` — empty file (Tailwind only)
 
 **Checkpoint**: User Story 1 complete — people list loads, click navigates to dashboard.
 
@@ -55,8 +55,8 @@
 
 **Independent Test**: With the app running, type a partial name into the filter input. Confirm only matching users are shown. Clear the input — full list restores.
 
-- [ ] T008 [US2] Add filter signals to `src/app/home/home.component.ts` — add `filterControl = new FormControl('')`, `filterValue = toSignal(this.filterControl.valueChanges, { initialValue: '' })`, replace `users()` in template references with `filteredUsers = computed(() => this.users().filter(u => (u.firstName + ' ' + u.lastName).toLowerCase().includes((this.filterValue() ?? '').toLowerCase())))`
-- [ ] T009 [US2] Add search input to `src/app/home/home.component.html` — `<input [formControl]="filterControl" placeholder="Search by name…" />` placed between the header and the user list; update `@for` to iterate over `filteredUsers()` instead of `users()`
+- [x] T008 [US2] Add filter signals to `src/app/home/home.component.ts` — add `filterControl = new FormControl('')`, `filterValue = toSignal(this.filterControl.valueChanges, { initialValue: '' })`, replace `users()` in template references with `filteredUsers = computed(() => this.users().filter(u => (u.firstName + ' ' + u.lastName).toLowerCase().includes((this.filterValue() ?? '').toLowerCase())))`
+- [x] T009 [US2] Add search input to `src/app/home/home.component.html` — `<input [formControl]="filterControl" placeholder="Search by name…" />` placed between the header and the user list; update `@for` to iterate over `filteredUsers()` instead of `users()`
 
 **Checkpoint**: User Story 2 complete — live client-side name filter works with no extra API call.
 
@@ -68,7 +68,7 @@
 
 **Independent Test**: Confirm the Register button is visible on the home page at all times (loaded, loading, empty, and error states). Click it — lands on `/register`.
 
-- [ ] T010 [US3] Add Register button to the header in `src/app/home/home.component.html` — `<a routerLink="/register">Register</a>` styled as an indigo-600 button, positioned in the page header alongside the app title; confirm `RouterModule` is in the component's `imports` array
+- [x] T010 [US3] Add Register button to the header in `src/app/home/home.component.html` — `<a routerLink="/register">Register</a>` styled as an indigo-600 button, positioned in the page header alongside the app title; confirm `RouterModule` is in the component's `imports` array
 
 **Checkpoint**: User Story 3 complete — new users can reach `/register` from the home page.
 
@@ -80,7 +80,7 @@
 
 **Independent Test**: Temporarily mock or stop the back-end so it returns `[]`. Confirm the empty state message renders. Confirm the Register button is still visible.
 
-- [ ] T011 [US4] Add empty state block inside the `@if (!loading() && !error())` section of `src/app/home/home.component.html` — wrap the `@for` in `@if (filteredUsers().length > 0) { @for ... } @else { <p>No users registered yet.</p> }`
+- [x] T011 [US4] Add empty state block inside the `@if (!loading() && !error())` section of `src/app/home/home.component.html` — wrap the `@for` in `@if (filteredUsers().length > 0) { @for ... } @else { <p>No users registered yet.</p> }`
 
 **Checkpoint**: User Story 4 complete — no blank screen on an empty system.
 
@@ -90,9 +90,9 @@
 
 **Purpose**: Spec files and final build verification.
 
-- [ ] T012 [P] Create `src/app/services/user.service.spec.ts` — SpecKit spec covering: `getAll()` returns `User[]` on 200, surfaces error message on failure
-- [ ] T013 [P] Create `src/app/home/home.component.spec.ts` — SpecKit spec covering: renders user list, navigates on click, filters by name, shows empty state, shows error banner
-- [ ] T014 Run `ng build` from `~/Desktop/Financial-calculator-front-end` and confirm zero TypeScript/template errors
+- [x] T012 [P] Create `src/app/services/user.service.spec.ts` — SpecKit spec covering: `getAll()` returns `User[]` on 200, surfaces error message on failure
+- [x] T013 [P] Create `src/app/home/home.component.spec.ts` — SpecKit spec covering: renders user list, navigates on click, filters by name, shows empty state, shows error banner
+- [x] T014 Run `ng build` from `~/Desktop/Financial-calculator-front-end` and confirm zero TypeScript/template errors
 - [ ] T015 Run `ng serve`, open `http://localhost:4200`, manually verify: list loads, filter works, name click navigates, Register button navigates to `/register`
 
 ---

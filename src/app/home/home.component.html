@@ -1,0 +1,63 @@
+<div class="min-h-screen bg-gray-50">
+
+  <!-- Header -->
+  <header class="bg-white shadow-sm">
+    <div class="max-w-3xl mx-auto px-4 py-5 flex items-center justify-between">
+      <h1 class="text-2xl font-bold text-indigo-600">SA Tax Calculator</h1>
+      <a routerLink="/register"
+         class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">
+        Register
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 py-8">
+
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">Select your name to continue</h2>
+
+    <!-- Search filter -->
+    <input
+      [formControl]="filterControl"
+      type="text"
+      placeholder="Search by name…"
+      class="w-full mb-6 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    />
+
+    <!-- Loading spinner -->
+    @if (loading()) {
+      <div class="flex justify-center py-12">
+        <div class="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    }
+
+    <!-- Error banner -->
+    @if (error()) {
+      <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+        {{ error() }}
+      </div>
+    }
+
+    <!-- User list -->
+    @if (!loading() && !error()) {
+      @if (filteredUsers().length === 0) {
+        <div class="text-center py-12 text-gray-500">
+          <p class="text-base">No users registered yet.</p>
+          <p class="text-sm mt-1">Click <strong>Register</strong> above to create your account.</p>
+        </div>
+      } @else {
+        <ul class="space-y-2">
+          @for (user of filteredUsers(); track user.id) {
+            <li>
+              <button
+                (click)="goToDashboard(user.id)"
+                class="w-full text-left px-5 py-4 bg-white border border-gray-200 rounded-lg hover:border-indigo-400 hover:shadow-sm transition-all text-gray-800 font-medium">
+                {{ user.firstName }} {{ user.lastName }}
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    }
+
+  </main>
+</div>
