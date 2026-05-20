@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { DatePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { UserService } from '../services/user.service';
 import { TaxService } from '../services/tax.service';
@@ -10,7 +10,7 @@ import { TaxCalculation } from '../models/tax-calculation.model';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [DatePipe, RouterModule],
+  imports: [CurrencyPipe, DatePipe, RouterModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
