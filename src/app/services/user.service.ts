@@ -15,4 +15,12 @@ export class UserService {
       )
     );
   }
+
+  getById(id: number): Observable<User> {
+    return this.http.get<User>(`${environment.apiBaseUrl}/user/${id}`).pipe(
+      catchError(err =>
+        throwError(() => new Error(err.error?.message ?? 'User not found'))
+      )
+    );
+  }
 }
