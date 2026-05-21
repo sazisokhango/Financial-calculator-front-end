@@ -4,8 +4,10 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { UserService } from '../services/user.service';
 import { TaxService } from '../services/tax.service';
+import { InvestmentService } from '../services/investment.service';
 import { User } from '../models/user.model';
 import { TaxCalculation } from '../models/tax-calculation.model';
+import { InvestmentForecast } from '../models/investment-forecast.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,24 +21,34 @@ export class DashboardComponent implements OnInit {
   private router = inject(Router);
   private userService = inject(UserService);
   private taxService = inject(TaxService);
+  private investmentService = inject(InvestmentService);
 
   user = signal<User | null>(null);
   calculations = signal<TaxCalculation[]>([]);
+  forecasts = signal<InvestmentForecast[]>([]);
+  activeTab = signal<'tax' | 'investments'>('tax');
   loading = signal(true);
   error = signal<string | null>(null);
+  forecastsError = signal<string | null>(null);
 
-  private userId!: number;
+  userId!: number;
 
   ngOnInit(): void {
     this.userId = Number(this.route.snapshot.paramMap.get('id'));
 
+    this.route.queryParams.subscribe(params => {
+      this.activeTab.set(params['tab'] === 'investments' ? 'investments' : 'tax');
+    });
+
     forkJoin([
       this.userService.getById(this.userId),
-      this.taxService.getAllByUser(this.userId)
+      this.taxService.getAllByUser(this.userId),
+      this.investmentService.getAllByUser(this.userId)
     ]).subscribe({
-      next: ([user, calcs]) => {
+      next: ([user, calcs, forecasts]) => {
         this.user.set(user);
         this.calculations.set(calcs);
+        this.forecasts.set(forecasts);
         this.loading.set(false);
       },
       error: (err: Error) => {
@@ -59,6 +71,22 @@ export class DashboardComponent implements OnInit {
     this.taxService.delete(id).subscribe({
       next: () => this.calculations.update(list => list.filter(c => c.id !== id)),
       error: (err: Error) => this.error.set(err.message)
+    });
+  }
+
+  newForecast(): void {
+    this.router.navigate(['/user', this.userId, 'investments', 'forecast']);
+  }
+
+  viewForecast(forecastId: number): void {
+    this.router.navigate(['/user', this.userId, 'investments', forecastId]);
+  }
+
+  deleteForecast(id: number): void {
+    if (!window.confirm('Are you sure you want to delete this forecast?')) return;
+    this.investmentService.delete(id).subscribe({
+      next: () => this.forecasts.update(list => list.filter(f => f.id !== id)),
+      error: (err: Error) => this.forecastsError.set(err.message)
     });
   }
 }
