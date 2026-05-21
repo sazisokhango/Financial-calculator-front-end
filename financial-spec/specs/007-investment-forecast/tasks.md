@@ -106,7 +106,7 @@
 
 **Purpose**: Full end-to-end validation per quickstart.md.
 
-- [ ] T020 Run full quickstart.md happy path (10 steps): select user → switch to Investment Forecast tab → new forecast form → submit → result page (summary + table) → edit → updated result → delete → back to dashboard tab → switch to Tax Calculator tab. Verify no page reload on tab switch and deep-link to `?tab=investments` works.
+- [ ] T020 Run full quickstart.md happy path (requires backend running at localhost:8080) (10 steps): select user → switch to Investment Forecast tab → new forecast form → submit → result page (summary + table) → edit → updated result → delete → back to dashboard tab → switch to Tax Calculator tab. Verify no page reload on tab switch and deep-link to `?tab=investments` works.
 - [ ] T021 [P] Verify all monetary values across dashboard cards, result page summary, and projection table are formatted as `R #,###.##` using `en-ZA` locale
 
 ---
