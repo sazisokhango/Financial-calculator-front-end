@@ -39,7 +39,7 @@
 **Independent Test**: Navigate to `/user/1/investments/forecast`, fill title="Test", initialAmount=10000, monthlyContribution=2000, termMonths=12, annualInterestRate=10 — submit and verify result page renders summary fields and a 12-row projection table.
 
 - [ ] T005 Create `src/app/investment-forecast/investment-forecast.component.ts` — standalone component; `FormBuilder.group` with 6 controls (title: `[required]`, description: `[]`, initialAmount: `[required, min(0)]`, monthlyContribution: `[required, min(0)]`, termMonths: `[required, min(1)]`, annualInterestRate: `[required, min(0), max(100)]`); `userId` read from `ActivatedRoute` params on `ngOnInit`; `submitting = signal(false)`; `error = signal<string|null>(null)`; `onSubmit()` builds `InvestmentForecastRequest` with `userId` from route, calls `investmentService.create()`, navigates to `/user/:id/investments/:forecastId` on 201, sets error on failure
-- [ ] T006 Create `src/app/investment-forecast/investment-forecast.component.html` — header "New Investment Forecast" with "Back" link to `['/user', userId]` with `queryParams: {tab:'investments'}`; Reactive Form with all 6 fields; inline validation error `<p>` below each field using `@if (form.get('field')?.touched && form.get('field')?.errors?.['required'])`; "Calculate Forecast" button disabled during `submitting()` with spinner icon; red error banner `@if (error())`; imports: `ReactiveFormsModule`, `RouterModule`
+- [ ] T006 Create `src/app/investment-forecast/investment-forecast.component.html` — header "New Investment Forecast" with "Back" link to `['/user', userId]` with `queryParams: {tab:'investments'}`; Reactive Form with all 6 fields; inline validation error `<p>` below each field — show `@if (form.get('field')?.touched && form.get('field')?.errors?.['required'])` for title; for numeric fields show `required`, `min` ("cannot be negative" or "must be > 0"), and `max` ("must be between 0 and 100") errors independently using separate `@if` blocks per error key; "Calculate Forecast" button disabled during `submitting()` with spinner icon; red error banner `@if (error())`; imports: `ReactiveFormsModule`, `RouterModule`
 - [ ] T007 [P] Create empty `src/app/investment-forecast/investment-forecast.component.css`
 - [ ] T008 Create `src/app/investment-forecast/investment-forecast.component.spec.ts` — TestBed scaffold with `ReactiveFormsModule`, `HttpClientTestingModule`, `RouterTestingModule`
 
@@ -54,7 +54,7 @@
 **Independent Test**: Navigate to `/user/1?tab=investments` — Investment Forecast tab must be active and forecasts loaded. Click "Tax Calculator" tab — URL updates to `?tab=tax` and tax list renders. No page reload occurs during either switch.
 
 - [ ] T009 Modify `src/app/dashboard/dashboard.component.ts` — add `InvestmentService` injection; add signals: `forecasts = signal<InvestmentForecast[]>([])`, `activeTab = signal<'tax'|'investments'>('tax')`, `forecastsError = signal<string|null>(null)`; subscribe to `ActivatedRoute.queryParams` in `ngOnInit` to update `activeTab` signal (default `'tax'` when param absent); extend existing `forkJoin` to include `investmentService.getAllByUser(userId)` as third observable and set `forecasts` signal in the next handler; add methods: `newForecast()` → `router.navigate(['/user', userId, 'investments', 'forecast'])`, `viewForecast(id)` → navigate to view page, `deleteForecast(id)` → confirm dialog + `investmentService.delete(id)` + filter from `forecasts` signal on success
-- [ ] T010 Modify `src/app/dashboard/dashboard.component.html` — add tab bar below header (two buttons: "Tax Calculator" and "Investment Forecast") each using `[routerLink]="['/user', userId]"` with `[queryParams]="{tab:'tax'}"` / `[queryParams]="{tab:'investments'}"` and `queryParamsHandling="merge"`; active tab styled with `indigo-600` underline/background; update header action button to show "New Calculation" when `activeTab()==='tax'` and "New Forecast" when `activeTab()==='investments'`; wrap existing calculations list in `@if (activeTab() === 'tax')`; add `@if (activeTab() === 'investments')` section with forecast cards (title, truncated description, `createdAt | date:'dd MMM yyyy'`, `finalProjectedValue | currency:'ZAR'`, delete icon with `$event.stopPropagation()`); empty state for investments when `forecasts().length === 0`
+- [ ] T010 Modify `src/app/dashboard/dashboard.component.html` — add tab bar below header (two buttons: "Tax Calculator" and "Investment Forecast") each using `[routerLink]="['/user', userId]"` with `[queryParams]="{tab:'tax'}"` / `[queryParams]="{tab:'investments'}"` and `queryParamsHandling="merge"`; active tab styled with `indigo-600` underline/background; update header action button to show "New Calculation" when `activeTab()==='tax'` and "New Forecast" when `activeTab()==='investments'`; wrap existing calculations list in `@if (activeTab() === 'tax')`; add `@if (activeTab() === 'investments')` section that includes: (a) a red error banner `@if (forecastsError())` showing `forecastsError()` message, (b) forecast cards (title, truncated description, `createdAt | date:'dd MMM yyyy'`, `finalProjectedValue | currency:'ZAR'`, delete icon with `$event.stopPropagation()`), (c) empty state when `forecasts().length === 0`
 
 **Checkpoint**: Both tabs switch without page reload. Forecast cards render. Empty states work. Delete from dashboard works.
 
@@ -82,7 +82,7 @@
 **Independent Test**: Navigate to `/user/1/investments/1/edit` — form pre-populated with existing values. Change `annualInterestRate` to `8`, submit → result page shows updated figures.
 
 - [ ] T015 Create `src/app/edit-investment/edit-investment.component.ts` — standalone; same `FormBuilder.group` as `InvestmentForecastComponent` (identical 6 controls + validators); `ngOnInit`: reads `:id` and `:forecastId` from route, calls `investmentService.getById(forecastId)`, patches form with response via `form.patchValue({...})`; `submitting = signal(false)`, `loading = signal(true)`, `error = signal<string|null>(null)`; `onSubmit()` builds `InvestmentForecastRequest` with `userId` from route, calls `investmentService.update(forecastId, payload)`, navigates to view page on success; `cancel()` navigates to `/user/:id/investments/:forecastId`
-- [ ] T016 Create `src/app/edit-investment/edit-investment.component.html` — identical layout to `investment-forecast.component.html`; header reads "Edit Investment Forecast"; submit button reads "Save Changes"; adds "Cancel" link below form navigating to view page; loading spinner while form is being pre-populated
+- [ ] T016 Create `src/app/edit-investment/edit-investment.component.html` — identical layout to `investment-forecast.component.html` including the same per-field inline validation error blocks (`required`, `min`, `max` per numeric field); header reads "Edit Investment Forecast"; submit button reads "Save Changes"; adds "Cancel" link below form navigating to view page; loading spinner while form is being pre-populated
 - [ ] T017 [P] Create empty `src/app/edit-investment/edit-investment.component.css`
 - [ ] T018 Create `src/app/edit-investment/edit-investment.component.spec.ts` — TestBed scaffold
 
@@ -92,13 +92,13 @@
 
 ## Phase 6: Route Registration
 
-**Purpose**: All 3 new components now exist — safe to add all routes to `app.routes.ts` in one step.
+**Purpose**: Register investment routes in two steps so the MVP (Phases 1–3) can compile and run independently before the P2 components exist.
 
-**⚠️ NOTE**: Angular compilation will fail if this step is done before T005, T011, and T015 are complete.
+- [ ] T019a Add the MVP route to `src/app/app.routes.ts` — import `InvestmentForecastComponent`; add: `{ path: 'user/:id/investments/forecast', component: InvestmentForecastComponent }`. Run after T005 (Phase 2).
+- [ ] T019b Add the P2 routes to `src/app/app.routes.ts` — import `ViewInvestmentComponent`, `EditInvestmentComponent`; add: `{ path: 'user/:id/investments/:forecastId', component: ViewInvestmentComponent }`, `{ path: 'user/:id/investments/:forecastId/edit', component: EditInvestmentComponent }`. Run after T011 (Phase 4) and T015 (Phase 5).
 
-- [ ] T019 Add 3 routes to `src/app/app.routes.ts` — import `InvestmentForecastComponent`, `ViewInvestmentComponent`, `EditInvestmentComponent`; add: `{ path: 'user/:id/investments/forecast', component: InvestmentForecastComponent }`, `{ path: 'user/:id/investments/:forecastId', component: ViewInvestmentComponent }`, `{ path: 'user/:id/investments/:forecastId/edit', component: EditInvestmentComponent }`
-
-**Checkpoint**: `npm start` serves the app without compilation errors. All 3 investment routes are navigable.
+**Checkpoint (after T019a)**: `npm start` compiles. New forecast form route is navigable. MVP is functional.
+**Checkpoint (after T019b)**: All 3 investment routes are navigable. Full feature complete.
 
 ---
 
@@ -120,7 +120,7 @@
 - **Phase 3 (US2)**: Requires Phase 1 complete (needs `InvestmentForecast` type + service)
 - **Phase 4 (US3)**: Requires Phase 1 complete
 - **Phase 5 (US4)**: Requires Phase 1 complete
-- **Phase 6 (Routes)**: Requires Phases 2, 4, and 5 complete (all 3 components must exist)
+- **Phase 6 (Routes)**: T019a requires Phase 2 complete; T019b requires Phases 4 and 5 complete
 - **Phase 7 (Polish)**: Requires Phase 6 complete (routes must be live)
 
 ### User Story Dependencies
@@ -172,15 +172,15 @@ Sequential: T011 → T012 → T014
 
 1. Complete Phase 1: Models + Service
 2. Complete Phase 2: InvestmentForecastComponent
-3. Complete Phase 3: Dashboard tab changes
-4. Complete Phase 6: Routes
+3. Complete T019a: Register InvestmentForecast route only
+4. Complete Phase 3: Dashboard tab changes
 5. **STOP and VALIDATE**: New forecast form submits, tab navigation works, dashboard shows saved forecasts
 
 ### Full Delivery (add P2 stories)
 
 6. Complete Phase 4: ViewInvestmentComponent
 7. Complete Phase 5: EditInvestmentComponent
-8. Update routes (already done in step 4 — all 3 routes were added together)
+8. Complete T019b: Register View + Edit investment routes
 9. Complete Phase 7: Polish & validation
 
 ---
@@ -194,9 +194,10 @@ Sequential: T011 → T012 → T014
 | Phase 3 — Dashboard Tab | T009–T010 | US2 | P1 |
 | Phase 4 — View Result | T011–T014 | US3 | P2 |
 | Phase 5 — Edit Forecast | T015–T018 | US4 | P2 |
-| Phase 6 — Routes | T019 | — | Integration |
+| Phase 6 — Routes (MVP) | T019a | — | Integration |
+| Phase 6 — Routes (P2) | T019b | — | Integration |
 | Phase 7 — Polish | T020–T021 | — | QA |
-| **Total** | **21 tasks** | | |
+| **Total** | **22 tasks** | | |
 
 ---
 

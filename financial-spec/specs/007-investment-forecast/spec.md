@@ -72,7 +72,7 @@ A user views a saved forecast and clicks "Edit". The form is pre-populated with 
 **Acceptance Scenarios**:
 
 1. **Given** a user clicks "Edit" on a forecast result page, **When** the edit form loads, **Then** all fields are pre-populated with the existing forecast values.
-2. **Given** the user changes one or more fields and clicks "Calculate Forecast", **When** the API call succeeds, **Then** the user is navigated to the updated forecast result page.
+2. **Given** the user changes one or more fields and clicks "Save Changes", **When** the API call succeeds, **Then** the user is navigated to the updated forecast result page.
 3. **Given** the edit form has validation errors, **When** the user tries to submit, **Then** the form does not submit and inline error messages appear below the affected fields.
 
 ---
