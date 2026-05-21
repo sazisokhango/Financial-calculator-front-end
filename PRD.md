@@ -45,12 +45,19 @@ There is no password-based login. Users register once with their name and email,
 ```
 / (Home — people list)
   │
-  ├─ Name found → click → /user/:id  (Dashboard)
+  ├─ Name found → click → /user/:id  (Dashboard — two tabs, no page reload)
   │                          │
-  │                          ├─ View saved calculations
-  │                          ├─ Click calculation → /user/:id/calculations/:calcId (View)
-  │                          │                          └─ Edit → /user/:id/calculations/:calcId/edit
-  │                          └─ New Calculation → /user/:id/calculate
+  │                          ├─ [Tab: Tax Calculator] (default, ?tab=tax)
+  │                          │     ├─ View saved tax calculations
+  │                          │     ├─ Click calculation → /user/:id/calculations/:calcId (View)
+  │                          │     │                          └─ Edit → /user/:id/calculations/:calcId/edit
+  │                          │     └─ New Calculation → /user/:id/calculate
+  │                          │
+  │                          └─ [Tab: Investment Forecast] (?tab=investments)
+  │                                ├─ View saved investment forecasts
+  │                                ├─ Click forecast → /user/:id/investments/:forecastId (View)
+  │                                │                       └─ Edit → /user/:id/investments/:forecastId/edit
+  │                                └─ New Forecast → /user/:id/investments/forecast
   │
   └─ Name not found → /register → on success → / (Home)
 ```
@@ -59,16 +66,21 @@ There is no password-based login. Users register once with their name and email,
 
 ## 5. Routes
 
-| Path                                          | Component               | Guard      |
-|-----------------------------------------------|-------------------------|------------|
-| `/`                                           | HomeComponent           | None       |
-| `/register`                                   | RegisterComponent       | None       |
-| `/user/:id`                                   | DashboardComponent      | None       |
-| `/user/:id/calculate`                         | CalculateComponent      | None       |
-| `/user/:id/calculations/:calcId`              | ViewCalculationComponent| None       |
-| `/user/:id/calculations/:calcId/edit`         | EditCalculationComponent| None       |
+| Path                                              | Component                    | Guard      |
+|---------------------------------------------------|------------------------------|------------|
+| `/`                                               | HomeComponent                | None       |
+| `/register`                                       | RegisterComponent            | None       |
+| `/user/:id`                                       | DashboardComponent           | None       |
+| `/user/:id/calculate`                             | CalculateComponent           | None       |
+| `/user/:id/calculations/:calcId`                  | ViewCalculationComponent     | None       |
+| `/user/:id/calculations/:calcId/edit`             | EditCalculationComponent     | None       |
+| `/user/:id/investments/forecast`                  | InvestmentForecastComponent  | None       |
+| `/user/:id/investments/:forecastId`               | ViewInvestmentComponent      | None       |
+| `/user/:id/investments/:forecastId/edit`          | EditInvestmentComponent      | None       |
 
 > No route guards are required for this release — user identity is carried by the URL `userId` parameter.
+
+> **Tab navigation**: `DashboardComponent` reads the `tab` query parameter (`?tab=tax` | `?tab=investments`). Default is `tax`. Tab switches update the query param via Angular Router — no page reload occurs.
 
 ---
 
@@ -271,7 +283,107 @@ Response 200: TaxCalculationResponse
 
 ---
 
-## 7. TaxCalculationResponse Shape
+### Feature 7 — Investment Forecast
+
+**Route**: `/user/:id/investments/forecast` (new) | `/user/:id/investments/:forecastId` (view) | `/user/:id/investments/:forecastId/edit` (edit)
+
+**Dashboard Tab**: `?tab=investments` on `/user/:id`
+
+**Purpose**: Allow the user to enter investment details, calculate growth projections, view a forecast summary, and inspect a month-by-month projection table.
+
+**Dashboard Tab Behaviour**:
+- On tab switch to `investments`, call `GET /api/investments?userId={id}` and render saved forecasts as cards
+- Each card shows: title, description (truncated), date created, and a delete icon
+- Delete icon shows a confirmation dialog before calling `DELETE /api/investments/{forecastId}`
+- **"New Forecast"** button navigates to `/user/:id/investments/forecast`
+- Show empty state if no forecasts are saved yet
+
+**Input Form Fields**:
+| Field               | Type     | Required | Validation                  |
+|---------------------|----------|----------|-----------------------------|
+| title               | text     | Yes      | Cannot be empty             |
+| description         | textarea | No       | —                           |
+| initialAmount       | number   | Yes      | Cannot be negative          |
+| monthlyContribution | number   | Yes      | Cannot be negative          |
+| termMonths          | number   | Yes      | Must be > 0                 |
+| annualInterestRate  | number   | Yes      | Must be between 0 and 100   |
+
+Validation error messages are displayed inline below the affected field.
+
+**Behaviour**:
+- `userId` is sourced from the URL `:id` parameter — included in the request body; never entered manually
+- Submit calls `POST /api/investments/forecast`
+- On success (`201 Created`) navigate to `/user/:id/investments/:forecastId` (view result)
+- On error show the API `message` field
+- Show loading state on the "Calculate Forecast" button while the request is in flight
+
+**APIs**:
+```
+POST /api/investments/forecast
+Body: {
+  "userId": 1,
+  "title": "Retirement Growth Plan",
+  "description": "Long-term investment",
+  "initialAmount": 10000,
+  "monthlyContribution": 2000,
+  "termMonths": 60,
+  "annualInterestRate": 10
+}
+Response 201: InvestmentForecastResponse (see Section 7.2)
+
+GET /api/investments?userId={id}
+Response 200: [ InvestmentForecastResponse, ... ]
+
+GET /api/investments/{id}
+Response 200: InvestmentForecastResponse
+Response 404: { "status": 404, "error": "Not Found", "message": "Forecast not found" }
+
+PUT /api/investments/{id}
+Body: Same as POST /api/investments/forecast
+Response 200: InvestmentForecastResponse
+
+DELETE /api/investments/{id}
+Response 204: No Content
+```
+
+**View Forecast Page** (`/user/:id/investments/:forecastId`):
+- On load call `GET /api/investments/{forecastId}`
+- Display inputs section and forecast summary section
+- Display month-by-month projection table
+- **"Edit"** button navigates to `/user/:id/investments/:forecastId/edit`
+- **"Delete"** button shows confirmation dialog then calls `DELETE /api/investments/{forecastId}` → navigate to `/user/:id?tab=investments`
+- **"Back"** link navigates to `/user/:id?tab=investments`
+
+*Forecast Summary Fields*:
+| Label                 | Field                |
+|-----------------------|----------------------|
+| Final Projected Value | finalProjectedValue  |
+| Total Contributions   | totalContributions   |
+| Total Interest Earned | totalInterestEarned  |
+| ROI Percentage        | roiPercentage        |
+| Average Monthly Growth| averageMonthlyGrowth |
+
+*Monthly Projection Table Columns*:
+| Column               | Field               |
+|----------------------|---------------------|
+| Month                | month               |
+| Starting Balance     | startingBalance     |
+| Monthly Contribution | monthlyContribution |
+| Interest Earned      | interestEarned      |
+| Ending Balance       | endingBalance       |
+
+**Edit Forecast Page** (`/user/:id/investments/:forecastId/edit`):
+- On load call `GET /api/investments/{forecastId}` and pre-populate the form
+- Same form fields and validation as the new forecast form
+- Submit calls `PUT /api/investments/{forecastId}`
+- On success (`200 OK`) navigate to `/user/:id/investments/:forecastId`
+- On error show the API `message` field
+
+---
+
+## 7. Response Shapes
+
+### 7.1 TaxCalculationResponse
 
 ```json
 {
@@ -292,6 +404,46 @@ Response 200: TaxCalculationResponse
   "taxBeforeRebate": 120000.00,
   "rebate": 17000.00,
   "finalTaxLiability": 103000.00,
+  "createdAt": "2025-03-01T10:15:30",
+  "updatedAt": "2025-03-01T10:20:45"
+}
+```
+
+---
+
+### 7.2 InvestmentForecastResponse
+
+```json
+{
+  "id": 1,
+  "userId": 1,
+  "title": "Retirement Growth Plan",
+  "description": "Long-term investment",
+  "initialAmount": 10000.00,
+  "monthlyContribution": 2000.00,
+  "termMonths": 60,
+  "annualInterestRate": 10.0,
+  "finalProjectedValue": 163879.03,
+  "totalContributions": 130000.00,
+  "totalInterestEarned": 33879.03,
+  "roiPercentage": 26.06,
+  "averageMonthlyGrowth": 564.65,
+  "monthlyProjections": [
+    {
+      "month": 1,
+      "startingBalance": 10000.00,
+      "monthlyContribution": 2000.00,
+      "interestEarned": 100.00,
+      "endingBalance": 12100.00
+    },
+    {
+      "month": 2,
+      "startingBalance": 12100.00,
+      "monthlyContribution": 2000.00,
+      "interestEarned": 121.00,
+      "endingBalance": 14221.00
+    }
+  ],
   "createdAt": "2025-03-01T10:15:30",
   "updatedAt": "2025-03-01T10:20:45"
 }
@@ -325,14 +477,15 @@ The front-end must extract and display the `message` field to the user.
 
 ## 10. Feature Roadmap
 
-| # | Feature                    | Branch                          | Priority |
-|---|----------------------------|---------------------------------|----------|
-| 1 | Home — People List         | `feature/001-home-people-list`  | P1       |
-| 2 | Registration               | `feature/002-registration`      | P1       |
-| 3 | User Dashboard             | `feature/003-user-dashboard`    | P2       |
-| 4 | Tax Calculation Form       | `feature/004-tax-calculation`   | P2       |
-| 5 | View Calculation           | `feature/005-view-calculation`  | P3       |
-| 6 | Edit Calculation           | `feature/006-edit-calculation`  | P3       |
+| # | Feature                    | Branch                                | Priority |
+|---|----------------------------|---------------------------------------|----------|
+| 1 | Home — People List         | `feature/001-home-people-list`        | P1       |
+| 2 | Registration               | `feature/002-registration`            | P1       |
+| 3 | User Dashboard             | `feature/003-user-dashboard`          | P2       |
+| 4 | Tax Calculation Form       | `feature/004-tax-calculation`         | P2       |
+| 5 | View Calculation           | `feature/005-view-calculation`        | P3       |
+| 6 | Edit Calculation           | `feature/006-edit-calculation`        | P3       |
+| 7 | Investment Forecast        | `feature/007-investment-forecast`     | P2       |
 
 Each feature is developed on its own branch following the SDD workflow:
 `specify plan` → `specify tasks` → `specify implement` → PR to `main`
