@@ -1,13 +1,13 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { CurrencyPipe, DatePipe, PercentPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { InvestmentService } from '../services/investment.service';
 import { InvestmentForecast } from '../models/investment-forecast.model';
 
 @Component({
   selector: 'app-view-investment',
   standalone: true,
-  imports: [CurrencyPipe, DatePipe, PercentPipe, RouterModule],
+  imports: [CurrencyPipe, DatePipe, DecimalPipe, RouterModule],
   templateUrl: './view-investment.component.html',
   styleUrl: './view-investment.component.css'
 })
