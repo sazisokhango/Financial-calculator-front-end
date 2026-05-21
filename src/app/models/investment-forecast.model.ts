@@ -6,6 +6,14 @@ export interface MonthlyProjection {
   endingBalance: number;
 }
 
+export interface ForecastResults {
+  projectedValue: number;
+  totalContributions: number;
+  totalInterestEarned: number;
+  roiPercentage: number;
+  averageMonthlyGrowth: number;
+}
+
 export interface InvestmentForecast {
   id: number;
   userId: number;
@@ -15,12 +23,8 @@ export interface InvestmentForecast {
   monthlyContribution: number;
   termMonths: number;
   annualInterestRate: number;
-  finalProjectedValue: number;
-  totalContributions: number;
-  totalInterestEarned: number;
-  roiPercentage: number;
-  averageMonthlyGrowth: number;
-  monthlyProjections: MonthlyProjection[];
+  forecastResults: ForecastResults;
+  monthlyProjection: MonthlyProjection[];
   createdAt: string;
   updatedAt: string;
 }

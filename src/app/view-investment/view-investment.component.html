@@ -83,23 +83,23 @@
         <dl class="divide-y divide-gray-50 text-sm">
           <div class="flex justify-between px-6 py-3">
             <dt class="text-gray-500">Total Contributions</dt>
-            <dd class="font-semibold text-gray-800">{{ forecast()!.totalContributions | currency:'ZAR':'symbol':'1.2-2' }}</dd>
+            <dd class="font-semibold text-gray-800">{{ forecast()!.forecastResults.totalContributions | currency:'ZAR':'symbol':'1.2-2' }}</dd>
           </div>
           <div class="flex justify-between px-6 py-3">
             <dt class="text-gray-500">Total Interest Earned</dt>
-            <dd class="font-semibold text-emerald-600">+ {{ forecast()!.totalInterestEarned | currency:'ZAR':'symbol':'1.2-2' }}</dd>
+            <dd class="font-semibold text-emerald-600">+ {{ forecast()!.forecastResults.totalInterestEarned | currency:'ZAR':'symbol':'1.2-2' }}</dd>
           </div>
           <div class="flex justify-between px-6 py-3">
             <dt class="text-gray-500">ROI</dt>
-            <dd class="font-semibold text-gray-800">{{ forecast()!.roiPercentage | number:'1.2-2' }}%</dd>
+            <dd class="font-semibold text-gray-800">{{ forecast()!.forecastResults.roiPercentage | number:'1.2-2' }}%</dd>
           </div>
           <div class="flex justify-between px-6 py-3">
             <dt class="text-gray-500">Average Monthly Growth</dt>
-            <dd class="font-semibold text-gray-800">{{ forecast()!.averageMonthlyGrowth | currency:'ZAR':'symbol':'1.2-2' }}</dd>
+            <dd class="font-semibold text-gray-800">{{ forecast()!.forecastResults.averageMonthlyGrowth | currency:'ZAR':'symbol':'1.2-2' }}</dd>
           </div>
           <div class="flex justify-between px-6 py-5 bg-gradient-to-r from-emerald-600 to-emerald-500">
             <dt class="font-bold text-white text-base">Final Projected Value</dt>
-            <dd class="font-extrabold text-white text-xl">{{ forecast()!.finalProjectedValue | currency:'ZAR':'symbol':'1.2-2' }}</dd>
+            <dd class="font-extrabold text-white text-xl">{{ forecast()!.forecastResults.projectedValue | currency:'ZAR':'symbol':'1.2-2' }}</dd>
           </div>
         </dl>
       </section>
@@ -121,7 +121,7 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-50">
-              @for (row of forecast()!.monthlyProjections; track row.month) {
+              @for (row of forecast()!.monthlyProjection; track row.month) {
                 <tr class="hover:bg-gray-50 transition-colors">
                   <td class="px-4 py-2.5 font-medium text-gray-700">{{ row.month }}</td>
                   <td class="px-4 py-2.5 text-right text-gray-600">{{ row.startingBalance | currency:'ZAR':'symbol':'1.2-2' }}</td>

@@ -170,7 +170,7 @@
                   </div>
                   <div class="hidden sm:block flex-shrink-0 text-right">
                     <p class="text-xs text-gray-400 mb-0.5">Final value</p>
-                    <p class="text-sm font-bold text-emerald-600">{{ forecast.finalProjectedValue | currency:'ZAR':'symbol':'1.0-0' }}</p>
+                    <p class="text-sm font-bold text-emerald-600">{{ forecast.forecastResults.projectedValue | currency:'ZAR':'symbol':'1.0-0' }}</p>
                   </div>
                   <button (click)="$event.stopPropagation(); deleteForecast(forecast.id)"
                     class="flex-shrink-0 p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
