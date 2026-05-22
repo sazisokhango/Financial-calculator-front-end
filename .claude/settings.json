@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git merge docs/007-investment-forecast-requirements --no-ff -m ' *)",
+      "Bash(mkdir -p /home/saziso/Desktop/Financial-calculator-front-end/financial-spec/specs/007-investment-forecast/checklists && echo \"done\")",
+      "Bash(bash .specify/scripts/bash/setup-tasks.sh --json)"
+    ],
+    "additionalDirectories": [
+      "/home/saziso/Desktop/Financial-calculator-front-end/financial-spec/specs/007-investment-forecast"
+    ]
+  }
+}
