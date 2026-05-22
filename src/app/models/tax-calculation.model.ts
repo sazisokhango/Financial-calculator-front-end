@@ -10,7 +10,7 @@ export interface TaxCalculation {
   retirementAnnuity: number;
   taxAlreadyPaid: number;
   age: number;
-  totalGrossIncome: number;
+  totalIncome: number;
   totalDeductions: number;
   netTaxableIncome: number;
   taxBeforeRebate: number;
