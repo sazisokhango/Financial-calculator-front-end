@@ -50,6 +50,11 @@ Non-negotiable API rules:
 - `GET  /api/investments/{id}`           → `200 OK` — single forecast with monthly projections
 - `PUT  /api/investments/{id}`           → `200 OK` — update and recalculate forecast
 - `DELETE /api/investments/{id}`         → `204 No Content`
+- `POST /api/bonds`                      → `201 Created` — save and calculate bond forecast
+- `GET  /api/bonds?userEmail={email}`    → `200 OK` — all bond forecasts for a user (keyed by email)
+- `GET  /api/bonds/{id}`                 → `200 OK` — single bond forecast with monthly projection
+- `PUT  /api/bonds/{id}`                 → `200 OK` — update and recalculate bond forecast
+- `DELETE /api/bonds/{id}`              → `204 No Content`
 
 The `apiBaseUrl` MUST be read exclusively from `environment.apiBaseUrl`.
 No base URL, IP address, or port number may appear as a string literal in any component or service.
@@ -75,11 +80,11 @@ There is no password-based login. The identity flow is:
 
 The `DashboardComponent` MUST implement tab switching using Angular Router query parameters.
 
-- Active tab is determined by the `tab` query parameter: `?tab=tax` (default) or `?tab=investments`
+- Active tab is determined by the `tab` query parameter: `?tab=tax` (default), `?tab=investments`, or `?tab=bonds`
 - Tab links MUST use `[routerLink]` with `[queryParams]` — never imperative `router.navigate` for tab UI
 - `queryParamsHandling: 'merge'` MUST be used to preserve the `:id` route param when switching tabs
 - A page reload MUST NOT occur when switching tabs; only the query param changes
-- Deep-linking to a tab MUST work (e.g. navigating directly to `/user/1?tab=investments` shows the correct tab)
+- Deep-linking to a tab MUST work (e.g. navigating directly to `/user/1?tab=investments` or `/user/1?tab=bonds` shows the correct tab)
 - Each tab's content section is conditionally rendered using `@if` based on the active tab
 
 ---
@@ -129,6 +134,9 @@ No component library (Angular Material, PrimeNG, etc.) may be added without a co
 | `/user/:id/investments/forecast`                  | `InvestmentForecastComponent`|
 | `/user/:id/investments/:forecastId`               | `ViewInvestmentComponent`    |
 | `/user/:id/investments/:forecastId/edit`          | `EditInvestmentComponent`    |
+| `/user/:id/bonds/forecast`                        | `BondForecastComponent`      |
+| `/user/:id/bonds/:bondId`                         | `ViewBondComponent`          |
+| `/user/:id/bonds/:bondId/edit`                    | `EditBondComponent`          |
 
 ---
 
@@ -148,6 +156,8 @@ All implementation plans, task lists, and code reviews MUST verify compliance wi
 these principles before proceeding.
 Refer to `PRD.md` for originating product requirements.
 
-**Version**: 1.1.0 | **Ratified**: 2026-05-20 | **Last Amended**: 2026-05-21
+**Version**: 1.2.0 | **Ratified**: 2026-05-20 | **Last Amended**: 2026-05-22
 
 **Amendment 1.1.0** (2026-05-21): Added Section VI — Tab Navigation Standard for `DashboardComponent`; added Investment Forecast API endpoints to Section IV; added `investment.service.ts` to services list; added 3 new investment routes to Route Map.
+
+**Amendment 1.2.0** (2026-05-22): Added Property Bond Forecast API endpoints (`/api/bonds`) to Section IV; added `bond.service.ts` to services list; added 3 new bond routes to Route Map; added `?tab=bonds` as a third valid dashboard tab value to Section VI.
