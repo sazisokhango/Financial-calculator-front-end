@@ -19,13 +19,21 @@
           </svg>
           New Calculation
         </button>
-      } @else {
+      } @else if (activeTab() === 'investments') {
         <button (click)="newForecast()"
           class="px-4 py-2 bg-white text-indigo-700 text-sm font-semibold rounded-lg hover:bg-indigo-50 transition-colors shadow-sm flex items-center gap-1.5">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
           </svg>
           New Forecast
+        </button>
+      } @else {
+        <button (click)="newBondForecast()"
+          class="px-4 py-2 bg-white text-indigo-700 text-sm font-semibold rounded-lg hover:bg-indigo-50 transition-colors shadow-sm flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>
+          New Bond Forecast
         </button>
       }
     </div>
@@ -48,6 +56,14 @@
         [class.text-indigo-300]="activeTab() !== 'investments'">
         Investment Forecast
       </a>
+      <a [routerLink]="['/user', userId]" [queryParams]="{tab: 'bonds'}" queryParamsHandling="merge"
+        class="px-5 py-3 text-sm font-semibold border-b-2 transition-colors"
+        [class.border-white]="activeTab() === 'bonds'"
+        [class.text-white]="activeTab() === 'bonds'"
+        [class.border-transparent]="activeTab() !== 'bonds'"
+        [class.text-indigo-300]="activeTab() !== 'bonds'">
+        Property Bond Forecast
+      </a>
     </div>
   </header>
 
@@ -60,7 +76,7 @@
       </div>
     }
 
-    <!-- Global Error (user/tax load failure) -->
+    <!-- Global Error (user/data load failure) -->
     @if (error()) {
       <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm flex items-center gap-2 mb-4">
         <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
@@ -126,7 +142,6 @@
       <!-- INVESTMENT FORECAST TAB -->
       @if (activeTab() === 'investments') {
 
-        <!-- Forecasts error banner -->
         @if (forecastsError()) {
           <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm flex items-center gap-2 mb-4">
             <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
@@ -184,6 +199,68 @@
           </ul>
         }
       }
+
+      <!-- PROPERTY BOND FORECAST TAB -->
+      @if (activeTab() === 'bonds') {
+
+        @if (bondsError()) {
+          <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm flex items-center gap-2 mb-4">
+            <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+            {{ bondsError() }}
+          </div>
+        }
+
+        @if (bonds().length === 0) {
+          <div class="text-center py-20">
+            <div class="w-20 h-20 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-5">
+              <svg class="w-10 h-10 text-indigo-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+              </svg>
+            </div>
+            <p class="text-gray-700 font-semibold text-lg">No bond forecasts yet</p>
+            <p class="text-sm text-gray-400 mt-1 mb-6">Calculate your first property bond repayment forecast.</p>
+            <button (click)="newBondForecast()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+              </svg>
+              New Bond Forecast
+            </button>
+          </div>
+        } @else {
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Saved Bond Forecasts</h2>
+            <span class="text-xs text-gray-400">{{ bonds().length }} record{{ bonds().length !== 1 ? 's' : '' }}</span>
+          </div>
+          <ul class="space-y-3">
+            @for (bond of bonds(); track bond.id) {
+              <li>
+                <div (click)="viewBond(bond.id)"
+                  class="bg-white border border-gray-200 rounded-xl px-5 py-4 hover:border-indigo-300 hover:shadow-md hover:-translate-y-px transition-all duration-150 cursor-pointer flex items-center gap-4 group">
+                  <div class="w-1.5 h-10 rounded-full bg-amber-200 group-hover:bg-amber-500 transition-colors flex-shrink-0"></div>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-gray-800 truncate group-hover:text-indigo-700 transition-colors">{{ bond.title }}</p>
+                    @if (bond.description) {
+                      <p class="text-xs text-gray-400 mt-0.5 truncate">{{ bond.description }}</p>
+                    }
+                    <p class="text-xs text-gray-400 mt-1">{{ bond.initialAmount | currency:'ZAR':'symbol':'1.0-0' }} over {{ bond.termMonths }} months</p>
+                  </div>
+                  <div class="hidden sm:block flex-shrink-0 text-right">
+                    <p class="text-xs text-gray-400 mb-0.5">Loan amount</p>
+                    <p class="text-sm font-bold text-amber-600">{{ bond.initialAmount | currency:'ZAR':'symbol':'1.0-0' }}</p>
+                  </div>
+                  <button (click)="$event.stopPropagation(); deleteBond(bond.id)"
+                    class="flex-shrink-0 p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0a1 1 0 011-1h4a1 1 0 011 1m-7 0H5m14 0h-2" />
+                    </svg>
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      }
+
     }
 
   </main>
