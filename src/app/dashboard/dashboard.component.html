@@ -4,7 +4,7 @@
   <header class="bg-gradient-to-r from-indigo-700 to-indigo-500 shadow-md">
     <div class="max-w-3xl mx-auto px-4 py-5 flex items-center justify-between">
       <div>
-        <p class="text-indigo-200 text-xs uppercase tracking-widest font-medium">SA Tax Calculator</p>
+        <a routerLink="/" class="text-indigo-200 text-xs uppercase tracking-widest font-medium cursor-pointer hover:text-white transition-colors">SA Tax Calculator</a>
         @if (user()) {
           <h1 class="text-xl font-extrabold text-white mt-0.5">{{ user()!.firstName }} {{ user()!.lastName }}</h1>
         } @else {
