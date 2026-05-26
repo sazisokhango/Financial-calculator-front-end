@@ -11,6 +11,9 @@ import { EditInvestmentComponent } from './edit-investment/edit-investment.compo
 import { BondForecastComponent } from './bond-forecast/bond-forecast.component';
 import { ViewBondComponent } from './view-bond/view-bond.component';
 import { EditBondComponent } from './edit-bond/edit-bond.component';
+import { LoanCalculatorComponent } from './loan-calculator/loan-calculator.component';
+import { ViewLoanComponent } from './view-loan/view-loan.component';
+import { EditLoanComponent } from './edit-loan/edit-loan.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -24,5 +27,8 @@ export const routes: Routes = [
   { path: 'user/:id/investments/:forecastId/edit', component: EditInvestmentComponent },
   { path: 'user/:id/bonds/forecast', component: BondForecastComponent },
   { path: 'user/:id/bonds/:bondId', component: ViewBondComponent },
-  { path: 'user/:id/bonds/:bondId/edit', component: EditBondComponent }
+  { path: 'user/:id/bonds/:bondId/edit', component: EditBondComponent },
+  { path: 'user/:id/loans/new', component: LoanCalculatorComponent },
+  { path: 'user/:id/loans/:loanId', component: ViewLoanComponent },
+  { path: 'user/:id/loans/:loanId/edit', component: EditLoanComponent }
 ];

@@ -7,10 +7,12 @@ import { UserService } from '../services/user.service';
 import { TaxService } from '../services/tax.service';
 import { InvestmentService } from '../services/investment.service';
 import { BondService } from '../services/bond.service';
+import { CarLoanService } from '../services/car-loan.service';
 import { User } from '../models/user.model';
 import { TaxCalculation } from '../models/tax-calculation.model';
 import { InvestmentForecast } from '../models/investment-forecast.model';
 import { PropertyBond } from '../models/property-bond.model';
+import { CarLoan } from '../models/car-loan.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -26,16 +28,19 @@ export class DashboardComponent implements OnInit {
   private taxService = inject(TaxService);
   private investmentService = inject(InvestmentService);
   private bondService = inject(BondService);
+  private carLoanService = inject(CarLoanService);
 
   user = signal<User | null>(null);
   calculations = signal<TaxCalculation[]>([]);
   forecasts = signal<InvestmentForecast[]>([]);
   bonds = signal<PropertyBond[]>([]);
-  activeTab = signal<'tax' | 'investments' | 'bonds'>('tax');
+  loans = signal<CarLoan[]>([]);
+  activeTab = signal<'tax' | 'investments' | 'bonds' | 'loans'>('tax');
   loading = signal(true);
   error = signal<string | null>(null);
   forecastsError = signal<string | null>(null);
   bondsError = signal<string | null>(null);
+  loansError = signal<string | null>(null);
 
   userId!: number;
 
@@ -46,6 +51,7 @@ export class DashboardComponent implements OnInit {
       this.activeTab.set(
         params['tab'] === 'investments' ? 'investments' :
         params['tab'] === 'bonds' ? 'bonds' :
+        params['tab'] === 'loans' ? 'loans' :
         'tax'
       );
     });
@@ -56,14 +62,16 @@ export class DashboardComponent implements OnInit {
         return forkJoin([
           this.taxService.getAllByUser(this.userId),
           this.investmentService.getAllByUser(this.userId),
-          this.bondService.getAllByUser(user.email)
+          this.bondService.getAllByUser(user.email),
+          this.carLoanService.getAllByUser(this.userId)
         ]);
       })
     ).subscribe({
-      next: ([calcs, forecasts, bonds]) => {
+      next: ([calcs, forecasts, bonds, loans]) => {
         this.calculations.set(calcs);
         this.forecasts.set(forecasts);
         this.bonds.set(bonds);
+        this.loans.set(loans);
         this.loading.set(false);
       },
       error: (err: Error) => {
@@ -118,6 +126,22 @@ export class DashboardComponent implements OnInit {
     this.bondService.delete(id).subscribe({
       next: () => this.bonds.update(list => list.filter(b => b.id !== id)),
       error: (err: Error) => this.bondsError.set(err.message)
+    });
+  }
+
+  newLoan(): void {
+    this.router.navigate(['/user', this.userId, 'loans', 'new']);
+  }
+
+  viewLoan(loanId: number): void {
+    this.router.navigate(['/user', this.userId, 'loans', loanId]);
+  }
+
+  deleteLoan(id: number): void {
+    if (!window.confirm('Are you sure you want to delete this loan calculation?')) return;
+    this.carLoanService.delete(id).subscribe({
+      next: () => this.loans.update(list => list.filter(l => l.id !== id)),
+      error: (err: Error) => this.loansError.set(err.message)
     });
   }
 }
